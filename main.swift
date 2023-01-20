@@ -1,30 +1,17 @@
-//
-//  main.swift
-//  SwiftDataStructure
-//
-//  Created by LEE on 2023/01/20.
-//
+var q = ImprovedQueue<String>()
 
-import Foundation
 
-var stack = Stack<Int>()
+q.push_back("Ada")
+q.push_back("Steve")
+q.push_back("Tim")     // [{Some "Ada"}, {Some "Steve"}, {Some "Tim"}]
+print(q.size)             // 3
 
-for number in 0...100{
-    stack.push(number)
-    print(stack.top!)
-}
+q.pop_front()       // "Ada"     // [nil, {Some "Steve"}, {Some "Tim"}]
+print(q.size)           // 2
 
-for number in 0...101{
-    print("pop :  \(stack.top)")
-    stack.pop()
-}
+q.pop_front()         // "Steve"
+           // [nil, nil, {Some "Tim"}]
+print(q.size)           // 1
 
-var stack2: Stack = [1,2,3,4]
-
-stack2.push(2323)
-
-stack2 = [1,2,3,4]
-
-for item in stack2{
-    print(item)
-}
+q.push_back("Grace")             // [nil, nil, {Some "Tim"}, {Some "Grace"}]
+print(q.size)      // 2
