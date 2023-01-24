@@ -1,17 +1,48 @@
-var q = ImprovedQueue<String>()
+var link = SinglyLinkedList(with: 2)
+link.append(4)
+link.append(6)
+link.append(8)
+link.append(10)
+link.append(12)
+
+print("size : \(link.size)")
+link.printAll()
+
+link.insert(5, at: 0)
+link.insert(5, at: 7)
+link.append(8)
+print("size : \(link.size)")
+link.printAll()
+
+link.remove(at:5)
+link.remove(at:2)
+print("size : \(link.size)")
+link.printAll()
+
+link.prepend(4)
+link.prepend(1)
+print("size : \(link.size)")
+link.printAll()
+
+link.remove(at:0)
+link.remove(at:8)
+
+print("size : \(link.size)")
+link.printAll()
 
 
-q.push_back("Ada")
-q.push_back("Steve")
-q.push_back("Tim")     // [{Some "Ada"}, {Some "Steve"}, {Some "Tim"}]
-print(q.size)             // 3
+link.remove(at:7)
+link.insert(4, at: 2)
 
-q.pop_front()       // "Ada"     // [nil, {Some "Steve"}, {Some "Tim"}]
-print(q.size)           // 2
+print("size : \(link.size)")
+link.printAll()
 
-q.pop_front()         // "Steve"
-           // [nil, nil, {Some "Tim"}]
-print(q.size)           // 1
 
-q.push_back("Grace")             // [nil, nil, {Some "Tim"}, {Some "Grace"}]
-print(q.size)      // 2
+for index in 0..<12{
+    print("[\(index)] : \(link[index])")
+}
+
+print("size : \(link.size)")
+link.printAll()
+print("first node data : \(link.dummyNode.next!.data!)")
+print("last node data : \(link.tailNode!.data!)")
