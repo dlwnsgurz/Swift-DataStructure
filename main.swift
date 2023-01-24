@@ -1,4 +1,4 @@
-var link = SinglyLinkedList(with: 2)
+var link = DoublyLinkedList(with: 2)
 link.append(4)
 link.append(6)
 link.append(8)
@@ -38,7 +38,7 @@ print("size : \(link.size)")
 link.printAll()
 
 
-for index in 0..<12{
+for index in 0..<link.size{
     print("[\(index)] : \(link[index])")
 }
 
@@ -46,3 +46,29 @@ print("size : \(link.size)")
 link.printAll()
 print("first node data : \(link.dummyNode.next!.data!)")
 print("last node data : \(link.tailNode!.data!)")
+
+link.removeFirst()
+print("size : \(link.size)")
+link.printAll()
+link.removeLast()
+print("size : \(link.size)")
+link.printAll()
+link.removeFirst()
+print("size : \(link.size)")
+link.printAll()
+link.removeLast()
+print("size : \(link.size)")
+link.printAll()
+link.removeFirst()
+print("size : \(link.size)")
+link.printAll()
+link.removeLast()
+print("size : \(link.size)")
+link.printAll()
+link.removeFirst()
+print("size : \(link.size)")
+link.printAll()
+
+link.removeLast()
+print("size : \(link.size)")
+link.printAll()
