@@ -53,4 +53,10 @@ struct CircularQueue<Element>{
         return element
     }
     
+    subscript(index: Int) -> Element?{
+        
+        if index < 0 || index >= size || isEmpty { return nil }
+        return elements[(front + index) % elements.count]
+    }
+    
 }
