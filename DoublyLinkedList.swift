@@ -132,12 +132,19 @@ class DoublyLinkedList<Element>{
     subscript(index: Int) -> Element?{
         
         if index < 0 || index >= size || isEmpty { return nil }
-        
         var iterator = dummyNode.next!
         for _ in 0..<index{
             iterator = iterator.next!
         }
         return iterator.data!
+    }
+    
+    var front: Element?{
+        return dummyNode.next?.data ?? nil
+    }
+    
+    var back: Element?{
+        return tailNode?.data ?? nil
     }
     
 }
