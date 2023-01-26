@@ -386,18 +386,26 @@ enum BinarySearchTreeByEnumeration<Element: Comparable>{
         }
     }
     
-    func insert(newValue: Element) -> BinarySearchTreeByEnumeration{
-        switch self{
+    func insert(newValue: Element) -> BinarySearchTreeByEnumeration {
+        switch self {
         case .Empty:
-            return .Leaf(newValue)
-        case .Leaf(let value) :
-            if value < newValue { return .Node(.Empty, value, .Leaf(newValue))}
-            else { return .Node(.Leaf(newValue), value, .Empty)}
+          return .Leaf(newValue)
+
+        case .Leaf(let value):
+          if newValue < value {
+            return .Node(.Leaf(newValue), value, .Empty)
+          } else {
+            return .Node(.Empty, value, .Leaf(newValue))
+          }
+
         case .Node(let left, let value, let right):
-            if value < newValue { return .Node(left, value, insert(newValue: newValue))}
-            else { return .Node(insert(newValue: newValue), value, right)}
+          if newValue < value {
+              return .Node(left.insert(newValue: newValue), value, right)
+          } else {
+              return .Node(left, value, right.insert(newValue: newValue))
+          }
         }
-    }
+      }
     
     func search(x: Element) -> BinarySearchTreeByEnumeration?{
         switch self{
