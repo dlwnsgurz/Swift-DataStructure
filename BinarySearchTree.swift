@@ -52,46 +52,81 @@ class BinarySearchTreeByLinkedList<Element: Comparable>{
         }
     }
     
-    func remove(data: Element) -> Element?{
-        if !search(for: data) { return nil }
-        guard let root = self.root else { return nil }
+    func remove(data: Element) -> Bool{
+        if !search(for: data) { return false }
+        guard let root = self.root else { return false }
         
-        var removeNode = root
-        var parentNode = removeNode
-        while(true){
-            if data > removeNode.data {
-                parentNode = removeNode
-                removeNode = removeNode.right!
-            }else if data < removeNode.data{
-                parentNode = removeNode
-                removeNode = removeNode.left!
-            }else{
-                break
-            }
+        /// 삭제할 노드의 부모 노드
+        var parentNode = root
+        
+        /// 삭제할 노드를 탐색하기 위한 노드.
+        var currentNode : Node? = root
+        
+        /// 삭제할 노드 탐색
+        while let node = currentNode{
+            if data > node.data{
+                currentNode = node.right
+            }else if data < node.data{
+                currentNode = node.left
+            }else{ break }
+            parentNode = node
         }
-        /// 지울 노드가 부모 노드의 왼쪽인지 오른쪽인지 구분 해야함..
-        if let left = removeNode.left, let _ = removeNode.right{
-            var leafNode = left
-            var leafParentNode = leafNode
-            while leafNode.right != nil {
-                leafParentNode = leafNode
-                leafNode = leafNode.right!
+        
+        /// 삭제할 노드의 자식 노드가 없는 경우
+        if currentNode?.left == nil && currentNode?.right == nil {
+            if data > parentNode.data { parentNode.right = nil }
+            else if data < parentNode.data { parentNode.left = nil }
+            self.count -= 1
+            return true
+        }
+        
+        /// 삭제할 노드의 자식 노드가 1개인 경우
+        if currentNode?.left != nil && currentNode?.right == nil{   // 삭제할 노드가 왼쪽 자식 노드만 있는 경우.
+            if data > parentNode.data{  // 삭제할 노드가 부모 노드의 오른쪽 자식인 경우.
+                parentNode.right = currentNode!.left
+            }else if data < parentNode.data{    // 삭제할 노드가 부모 노드의 왼쪽 자식인 경우.
+                parentNode.left = currentNode!.left
             }
-            leafNode.left = removeNode.left
-            leafNode.right = removeNode.right
+            self.count -= 1
+            return true
+        }else if currentNode?.right != nil && currentNode?.left == nil{ // 삭제할 노드가 오른쪽 자식 노드만 있는 경우.
+            if data > parentNode.data{  // 삭제할 노드가 부모 노드의 오른쪽 자식인 경우.
+                parentNode.right = currentNode!.right
+            }else if data < parentNode.data{    // 삭제할 노드가 부모 노드의 왼쪽 자식인 경우.
+                parentNode.left = currentNode!.right
+            }
+            self.count -= 1
+            return true
+        }
+        
+        /// 삭제할 노드의 자식 노드가 2개인 경우
+        /// 삭제할 노드의 오른쪽 자식 노드들 중, 가장 작은 노드를 삭제할 노드와 교체.
+        var leafNode = currentNode!.right
+        var leafParentNode = currentNode
+        
+        while let leaf = leafNode?.left{
+            leafParentNode = leafNode
+            leafNode = leaf
+        }
+        
+        /// 찾은 가장 작은 노드가 오른쪽 자식 노드가 있다면
+        if let right = leafNode?.right{
+            leafParentNode?.left = right
+        }else{
+            leafParentNode?.left = nil
+        }
+        
+        /// 리프 노드가 삭제할 노드를 대체
+        leafNode?.left = currentNode?.left
+        leafNode?.right = currentNode?.right
+        
+        if data > parentNode.data{
             parentNode.right = leafNode
-            leafParentNode.right = nil
+        }else if data < parentNode.data{
+            parentNode.left = leafNode
         }
-        
-        if let left = removeNode.left{
-            
-        }
-        
-        if let right = removeNode.right{
-            
-        }
-
-        
+        self.count -= 1
+        return true
     }
 
     
@@ -108,6 +143,7 @@ class Node<Element: Comparable>{
         self.data = data
     }
 }
+
 
 extension BinarySearchTreeByLinkedList{
     func drawDiagram() {
