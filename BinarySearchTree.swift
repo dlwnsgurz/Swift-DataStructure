@@ -165,3 +165,251 @@ extension BinarySearchTreeByLinkedList{
             + diagram(for: node.left, bottom + "│ ", bottom + "└──", bottom + " ")
     }
 }
+
+class BinarySearchTree<Element: Comparable>{
+    
+    var value: Element
+    var parent: BinarySearchTree<Element>?
+    var left: BinarySearchTree<Element>?
+    var right: BinarySearchTree<Element>?
+    
+    init(value: Element){
+        self.value = value
+    }
+    
+    convenience init(array: [Element]){
+        self.init(value: array[0])
+        for i in 1..<array.count{
+            insert(value: array[i])
+        }
+    }
+    
+    var isRoot: Bool{
+        return parent == nil
+    }
+    
+    var isLeaf: Bool{
+        return left == nil && right == nil
+    }
+    
+    var isLeftChild: Bool{
+        return parent?.left === self
+    }
+    
+    var isRightChild: Bool{
+        return parent?.right === self
+    }
+    
+    var hasLeftChild: Bool{
+        return left != nil
+    }
+    
+    var hasRightChild: Bool{
+        return right != nil
+    }
+    
+    var hasAnyChild: Bool{
+        return hasLeftChild || hasRightChild
+    }
+    
+    var hasBothChild: Bool{
+        return hasLeftChild && hasRightChild
+    }
+    
+    func insert(value: Element){
+        if value < self.value{
+            if let left = self.left{
+                left.insert(value: value)
+            }else{
+                left = BinarySearchTree(value: value)
+                left?.parent = self
+            }
+        }else{
+            if let right = self.right{
+                right.insert(value: value)
+            }else{
+                right = BinarySearchTree(value: value)
+                right?.parent = self
+            }
+        }
+    }
+    
+    func recursiveSearch(value: Element) -> BinarySearchTree?{
+        if value < self.value{
+            return left?.recursiveSearch(value: value)
+        }else if value > self.value{
+            return right?.recursiveSearch(value: value)
+        }else{
+            return self
+        }
+    }
+    
+    func loopSearch(value: Element) -> BinarySearchTree?{
+        var node: BinarySearchTree? = self
+        while let n = node{
+            if value > n.value{
+                node = n.right
+            }else if value < n.value{
+                node = n.left
+            }else{
+                return node
+            }
+        }
+        return nil
+    }
+    
+    func traverseInOrder(process: (Element) -> ()){
+        left?.traverseInOrder(process: process)
+        process(self.value)
+        right?.traverseInOrder(process: process)
+    }
+    
+    func traverseInPreOrder(process: (Element) -> ()){
+        process(self.value)
+        left?.traverseInOrder(process: process)
+        right?.traverseInOrder(process: process)
+        
+    }
+    
+    func traverseInPostOrder(process: (Element) -> ()){
+        left?.traverseInOrder(process: process)
+        right?.traverseInOrder(process: process)
+        process(self.value)
+    }
+    
+    func map(formular: (Element) -> Element) -> [Element]{
+        var array = [Element]()
+        if let left = left { array += left.map(formular: formular)}
+        array.append(value)
+        if let right = right { array += right.map(formular: formular)}
+        return array
+    }
+    
+    func toArray() -> [Element]{
+        return map{ $0 }
+    }
+    
+    private func reconnectParentTo(node: BinarySearchTree?){
+        if let parent = parent{
+            if isLeftChild{
+                parent.left = node
+            }else {
+                parent.right = node
+            }
+        }
+        node?.parent = parent
+    }
+    
+    func minimum() -> BinarySearchTree{
+        var node = self
+        while let next = node.left{
+            node = next
+        }
+        return node
+    }
+    
+    func maximum() -> BinarySearchTree{
+        var node = self
+        while let next = node.right{
+            node = next
+        }
+        return node
+    }
+    
+    @discardableResult
+    func remove() -> BinarySearchTree?{
+        let replacement: BinarySearchTree?
+        
+        if let right = right{
+            replacement = right.minimum()
+        }else if let left = left{
+            replacement = left.maximum()
+        }else{
+            replacement = nil
+        }
+        
+        replacement?.remove()
+        
+        replacement?.right = right
+        replacement?.left = left
+        right?.parent = replacement
+        left?.parent = replacement
+        reconnectParentTo(node:replacement)
+
+        // The current node is no longer part of the tree, so clean it up.
+        parent = nil
+        left = nil
+        right = nil
+        
+        return replacement
+    }
+    
+    func height() -> Int{
+        if isLeaf {
+            return 0
+        }else{
+            return 1 + max(left?.height() ?? 0, right?.height() ?? 0)
+        }
+    }
+    
+    func depth() -> Int{
+        var node = self
+        var edge = 0
+        while let level = node.parent{
+            node = level
+            edge += 1
+        }
+        return edge
+    }
+}
+
+
+enum BinarySearchTreeByEnumeration<Element: Comparable>{
+    case Empty
+    case Leaf(Element)
+    indirect case Node(BinarySearchTreeByEnumeration, Element, BinarySearchTreeByEnumeration)
+    
+    
+    var count: Int{
+        switch self{
+        case .Empty : return 0
+        case .Leaf : return 1
+        case let .Node(left, _ , right) : return left.count + right.count + 1
+        }
+    }
+    
+    var height: Int{
+        switch self{
+        case .Empty : return -1
+        case .Leaf : return 0
+        case let .Node(left, _, right): return 1 + max(left.height , right.height)
+        }
+    }
+    
+    func insert(newValue: Element) -> BinarySearchTreeByEnumeration{
+        switch self{
+        case .Empty:
+            return .Leaf(newValue)
+        case .Leaf(let value) :
+            if value < newValue { return .Node(.Empty, value, .Leaf(newValue))}
+            else { return .Node(.Leaf(newValue), value, .Empty)}
+        case .Node(let left, let value, let right):
+            if value < newValue { return .Node(left, value, insert(newValue: newValue))}
+            else { return .Node(insert(newValue: newValue), value, right)}
+        }
+    }
+    
+    func search(x: Element) -> BinarySearchTreeByEnumeration?{
+        switch self{
+        case .Empty:
+            return nil
+        case .Leaf(let y):
+            return (x==y) ? self : nil
+        case .Node(let left, let y, let right):
+            if x > y { return right.search(x: x)}
+            else if x < y{ return left.search(x: x)}
+            else { return self }
+        }
+    }
+    
+}
